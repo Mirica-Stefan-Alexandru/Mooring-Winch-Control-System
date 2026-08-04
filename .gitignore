@@ -1,0 +1,13 @@
+# TIA Portal temporary and system folders
+**/[I|i][M|m]/
+**/[L|l][O|o][G|g]/
+*.tmp
+*.bak
+*.ldf
+
+# User-specific settings (fereastra ta locală)
+*.user
+*.v18.user
+
+# PLCSIM temporary files
+*.sim
