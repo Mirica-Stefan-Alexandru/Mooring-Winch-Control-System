@@ -1,0 +1,9 @@
+﻿FUNCTION_BLOCK "test"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+
+BEGIN
+	SCALE_X(MIN:=_int_in_, VALUE:=_real_in_, MAX:=_int_in_)
+	NORM_X(MIN:=_int_in_, VALUE:=_int_in_, MAX:=_int_in_)
+END_FUNCTION_BLOCK
+
