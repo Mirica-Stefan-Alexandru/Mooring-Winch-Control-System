@@ -1,0 +1,41 @@
+﻿FUNCTION_BLOCK "Motor_Control"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      in_Joystick_Procent : Real;
+      in_Trip_Active : Bool;
+   END_VAR
+
+   VAR_OUTPUT 
+      out_Cmd_Tragere : Bool;
+      out_Cmd_Eliberare : Bool;
+      out_Viteza_Ref : Real;
+      out_Viteza_Norm : Real;
+      out_Viteza_Real : Real;
+   END_VAR
+
+
+BEGIN
+	#out_Viteza_Ref := ABS(#in_Joystick_Procent);
+	
+	IF #in_Trip_Active = TRUE THEN
+	    #out_Cmd_Tragere := FALSE;
+	    #out_Cmd_Eliberare := FALSE;
+	    #out_Viteza_Ref := 0.0;
+	ELSE
+	    IF #in_Joystick_Procent > 0.0 AND NOT #out_Cmd_Eliberare THEN
+	        #out_Cmd_Tragere := TRUE;
+	    ELSE
+	        #out_Cmd_Tragere := FALSE;
+	    END_IF;
+	    
+	    IF #in_Joystick_Procent < 0.0 AND NOT #out_Cmd_Tragere THEN
+	        #out_Cmd_Eliberare := TRUE;
+	    ELSE
+	        #out_Cmd_Eliberare := FALSE;
+	    END_IF;
+	END_IF;
+	#out_Viteza_Norm:=NORM_X(MIN := 0, VALUE := #out_Viteza_Ref, MAX := 100);
+	#out_Viteza_Real := SCALE_X(MIN := 0, VALUE := #out_Viteza_Norm, MAX := 120);
+END_FUNCTION_BLOCK
+
