@@ -1,0 +1,58 @@
+﻿FUNCTION_BLOCK "Motor_Control"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      in_Joystick_Procent : Real;
+      in_Trip_Active : Bool;
+      in_Buton_Start : Bool;
+      in_Buton_Stop : Bool;
+   END_VAR
+
+   VAR_OUTPUT 
+      out_Cmd_Tragere : Bool;
+      out_Cmd_Eliberare : Bool;
+      out_Viteza_Ref : Real;
+      out_Viteza_Norm : Real;
+      out_Viteza_Real : Real;
+   END_VAR
+
+   VAR 
+      stat_Stare_Motor : Bool;
+   END_VAR
+
+
+BEGIN
+	#out_Viteza_Ref := ABS(#in_Joystick_Procent);
+	
+	//Control directie in functie de polaritatea joystick-ului
+	
+	//Start/Stop motor 
+	IF #in_Buton_Stop OR #in_Trip_Active THEN
+	    #stat_Stare_Motor := FALSE;
+	    #out_Viteza_Ref := 0.0;
+	    #out_Cmd_Tragere := FALSE;
+	    #out_Cmd_Eliberare := FALSE;
+	ELSIF #in_Buton_Start THEN
+	    #stat_Stare_Motor := True;
+	END_IF;
+	
+	IF #stat_Stare_Motor = True THEN
+	        IF #in_Joystick_Procent > 0.0 AND NOT #out_Cmd_Eliberare THEN
+	            #out_Cmd_Tragere := TRUE;
+	        ELSE
+	            #out_Cmd_Tragere := FALSE;
+	        END_IF;
+	        
+	        IF #in_Joystick_Procent < 0.0 AND NOT #out_Cmd_Tragere THEN
+	            #out_Cmd_Eliberare := TRUE;
+	        ELSE
+	            #out_Cmd_Eliberare := FALSE;
+	        END_IF;
+	        //Normalizare si scalare a vitezei primite de la joystick
+	        #out_Viteza_Norm := NORM_X(MIN := 0, VALUE := #out_Viteza_Ref, MAX := 100);
+	        #out_Viteza_Real := SCALE_X(MIN := 0, VALUE := #out_Viteza_Norm, MAX := 120);
+	    END_IF;
+	
+	
+END_FUNCTION_BLOCK
+
