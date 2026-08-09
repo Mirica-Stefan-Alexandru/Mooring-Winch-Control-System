@@ -2,30 +2,29 @@
 
 Proiect de automatizare realizat in Siemens TIA Portal V18 pentru controlul unui troliu de amarare (Mooring Winch) bazat pe un PLC Siemens S7-1200 si o interfata HMI WinCC.
 
-Sistemul asigura controlul complet al motorului, achizitia semnalelor analogice, compensarea dinamica a sarcinii, protectii mecanice si monitorizare in timp real.
+Sistemul asigura controlul complet al motorului, achizitia semnalelor analogice, protectii avansate la suprasarcina si diagnoza in timp real pentru operatiuni marine in conditii de siguranta.
 
 ---
 
 ## Functionalitati Principale
 
 ### 1. Achizitie si Scalare Semnale Analogice
-* **Control Joystick:** Preluare intrare `IW2` si scalare in procentaj de comanda (`-100.0%` .. `100.0%`) cu filtru de zona moarta (*Deadband* intre `-5%` si `5%`) pentru eliminarea oscilatiilor.
-* **Măsurare Tensiune Cablu:** Preluare intrare Celula de Sarcina / Load Cell (`IW0`) si scalare in forta reala (`0` .. `100 kN`).
+* **Control Joystick:** Preluare intrare si scalare in procentaj de comanda (-100.0% .. 100.0%) cu filtru de zona moarta (Deadband) pentru eliminarea oscilatiilor mecanice.
+* **Masurare Tensiune Cablu:** Preluare semnal Load Cell si scalare in forta reala (0 .. 100 kN).
 
 ### 2. Logica de Control Motor
-* **Comanda Baza:** Control Start / Stop si determinarea automata a sensului de rotatie (Tragere / Eliberare cablu) in functie de pozitia joystick-ului.
-* **Management Viteza:** Profilare viteza din joystick cu rampe programabile de accelerare si decelerare pentru prevenirea socurilor mecanice.
-* **Interblocaje:** Protectie la schimbarea brusca a sensului de mers fara oprire prealabila.
+* **Comanda de Baza:** Start/Stop cu auto-mentinere, determinare automata a sensului de rotatie (Tragere / Eliberare) si interblocaje directionale de siguranta.
+* **Management Viteza:** Calcularea referintei de viteza (0..120 mpm) cu implementarea rampelor programabile de accelerare si decelerare.
 
-### 3. Protectie si Compensare Sarcina (Safety & Load)
-* **Compensare Dinamica:** Ajustarea automata a vitezei maxime de tragere/eliberare in functie de greutatea masurata pe cablu (sarcina mare = viteza redusa).
-* **Protectie la Supraturatie (SetSpeed):** Monitorizarea limitei de viteza sigure. La depasirea parametrului `SetSpeed`, se declanseaza oprirea automata a motorului (*Over-speed Trip*) si cuplarea imediata a franei mecanice de siguranta.
-* **Praguri de Tensiune:** Generare semnale de avertizare (`Limita_Warning` la `80 kN`) si oprire de urgenta (`Limita_Trip` la `95 kN`).
+### 3. Siguranta, Sarcina si ERS (Emergency Release)
+* **Selectie Cablu:** Limitarea dinamica a tensiunii si a vitezei maxime in functie de tipul si diametrul cablului utilizat.
+* **Protectie la Supraturatie (SetSpeed):** La depasirea vitezei setate de operator, sistemul intrerupe comanda motorului (Over-speed Trip) si cupleaza frana mecanica.
+* **Full Tension Release (ERS):** Sistem de urgenta pentru deblocarea instantanee a franei (pay-out) pentru a preveni ruperea cablului in caz de socuri extreme.
 
 ### 4. Interfata Operator (HMI WinCC)
-* **Ecran Monitorizare:** Afisare in timp real pentru viteza motorului, pozitia joystick-ului, tensiunea din cablu si starea franei.
-* **Parametrizare:** Campuri numerice pentru ajustarea pragurilor de viteza (`SetSpeed`) de catre operator.
-* **Sistem Alarme:** Banner si istoric de alarme pentru notificarea rapida a depasirilor de limite sau a validarilor de Trip/E-Stop.
+* **Monitorizare & Operare:** Interfata simpla, moderna cu afisaj clar pentru viteza, starea motorului, sageti directionale dinamice si parametrizare.
+* **Auto-Testare (Commissioning):** Ecran dedicat pentru diagnoza, generare rampa simulata pentru joystick si validare status I/O fara actionare fizica.
+* **Sistem Alarme:** Bannere tip pop-up si istoric cu declansare pe baza de biti (Word structure) pentru Warning-uri si defectiuni critice.
 
 ---
 
@@ -33,5 +32,5 @@ Sistemul asigura controlul complet al motorului, achizitia semnalelor analogice,
 
 * **Hardware PLC:** Siemens S7-1200 (CPU 1217C DC/DC/DC)
 * **Software:** Siemens TIA Portal V18
-* **Limbaje de Programare:** SCL / Ladder (LAD)
-* **Interfata Operator:** WinCC HMI Basic / Comfort Panel
+* **Limbaje de Programare:** SCL (Structured Control Language) / LAD
+* **Interfata Operator:** WinCC HMI Basic / Comfort Panel (Multi-screen Architecture)
