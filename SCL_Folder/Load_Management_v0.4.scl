@@ -1,0 +1,60 @@
+﻿FUNCTION_BLOCK "Load_Management"
+{ S7_Optimized_Access := 'TRUE' }
+VERSION : 0.1
+   VAR_INPUT 
+      in_Tip_Material : Int;
+      in_Diametru_mm : Real;
+      in_Sarcina_Reala : Real;
+      in_Reset_Trip : Bool;
+   END_VAR
+
+   VAR_OUTPUT 
+      out_Factor_Limitare : Real;
+      out_Alarma_MBL : Bool;
+      out_Eroare_Config : Bool;
+   END_VAR
+
+   VAR 
+      stat_MBL_Tone : Real;
+      stat_Procent_Sarcina : Real;
+      stat_Trip_Latched : Bool;
+   END_VAR
+
+
+BEGIN
+	CASE #in_Tip_Material OF
+	    1:
+	        #stat_MBL_Tone := (#in_Diametru_mm * #in_Diametru_mm) * 0.45;
+	        
+	    2:
+	        #stat_MBL_Tone := (#in_Diametru_mm * #in_Diametru_mm) * 0.15;
+	        
+	    3:
+	        #stat_MBL_Tone := (#in_Diametru_mm * #in_Diametru_mm) * 0.40;
+	        
+	    ELSE
+	        #stat_MBL_Tone := 10.0;
+	END_CASE;
+	
+	IF #stat_MBL_Tone > 0.0 THEN
+	    #stat_Procent_Sarcina := (#in_Sarcina_Reala / #stat_MBL_Tone) * 100.0;
+	ELSE
+	    #stat_Procent_Sarcina := 0.0;
+	END_IF;
+	
+	IF #stat_Procent_Sarcina < 75.0 THEN
+	    #out_Factor_Limitare := 1.0;
+	    #out_Alarma_MBL := FALSE;
+	    
+	ELSIF #stat_Procent_Sarcina >= 75.0 AND #stat_Procent_Sarcina <= 95.0 THEN
+	    #out_Factor_Limitare := 1.0 - ((#stat_Procent_Sarcina - 75.0) / 20.0);
+	    #out_Alarma_MBL := TRUE;
+	    
+	ELSE
+	    #out_Factor_Limitare := 0.0;
+	    #out_Alarma_MBL := TRUE;
+	    "Motor_Control_DB".in_Trip_Active := TRUE;
+	END_IF;
+	
+END_FUNCTION_BLOCK
+
