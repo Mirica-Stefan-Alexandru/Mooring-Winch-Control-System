@@ -1,0 +1,105 @@
+﻿FUNCTION_BLOCK "Motor_Control"
+{ S7_Optimized_Access := 'FALSE' }
+VERSION : 0.1
+   VAR_INPUT 
+      in_Joystick_Procent : Real;
+      Input_2 : Bool;
+      in_Buton_Start : Bool;
+      in_Buton_Stop : Bool;
+      in_SetSpeed_Procent : Real;
+      in_Buton_Reset : Bool;
+   END_VAR
+
+   VAR_OUTPUT 
+      out_Cmd_Tragere : Bool;
+      out_Cmd_Eliberare : Bool;
+      out_Viteza_Ref : Real;
+      out_Viteza_Norm : Real;
+      out_Viteza_Real : Real;
+      out_Stare_Motor : Bool;
+      out_Alarma_Overspeed : Bool;
+      out_Frana_Mecanica : Bool;
+   END_VAR
+
+   VAR_IN_OUT 
+      in_Trip_Active : Bool;
+   END_VAR
+
+   VAR 
+      stat_Viteza_Rampa : Real;
+   END_VAR
+
+
+BEGIN
+	IF #in_Buton_Reset THEN
+	    IF ABS(#out_Viteza_Real) < 0.1 THEN
+	        #in_Trip_Active := FALSE;
+	    END_IF;
+	END_IF;
+	
+	IF #in_Buton_Stop OR #in_Trip_Active THEN
+	    #out_Stare_Motor := FALSE;
+	ELSIF #in_Buton_Start THEN
+	    IF ABS(#stat_Viteza_Rampa) < 0.01 THEN
+	        #out_Stare_Motor := TRUE;
+	    END_IF;
+	END_IF;
+	
+	IF #in_Trip_Active THEN
+	    #stat_Viteza_Rampa := 0.0;
+	ELSE
+	    #stat_Viteza_Rampa := #in_Joystick_Procent * (#in_SetSpeed_Procent / 100.0);
+	END_IF;
+	
+	IF #out_Stare_Motor THEN
+	    "RampFunction_DB"(
+	                      Input := #stat_Viteza_Rampa,
+	                      SubstituteOutput := 0.0,
+	                      ErrorAck := FALSE,
+	                      Reset := FALSE,
+	                      Output => #stat_Viteza_Rampa
+	    );
+	ELSE
+	    "RampFunction_DB"(
+	                      Input := 0.0,
+	                      SubstituteOutput := 0.0,
+	                      ErrorAck := FALSE,
+	                      Reset := FALSE,
+	                      Output => #stat_Viteza_Rampa
+	    );
+	END_IF;
+	
+	IF ABS(#stat_Viteza_Rampa) > 0.1 THEN
+	    IF #stat_Viteza_Rampa > 0.0 THEN
+	        #out_Cmd_Tragere := TRUE;
+	        #out_Cmd_Eliberare := FALSE;
+	    ELSE
+	        #out_Cmd_Tragere := FALSE;
+	        #out_Cmd_Eliberare := TRUE;
+	    END_IF;
+	    
+	    #out_Viteza_Ref := ABS(#stat_Viteza_Rampa) * "Load_Management_DB".out_Factor_Limitare;
+	    #out_Viteza_Norm := NORM_X(MIN := 0.0, VALUE := #out_Viteza_Ref, MAX := 100.0);
+	    #out_Viteza_Real := SCALE_X(MIN := 0.0, VALUE := #out_Viteza_Norm, MAX := 120.0);
+	ELSE
+	    #out_Cmd_Tragere := FALSE;
+	    #out_Cmd_Eliberare := FALSE;
+	    #out_Viteza_Real := 0.0;
+	END_IF;
+	
+	IF ABS(#out_Viteza_Real) > 110.0 THEN
+	    #out_Alarma_Overspeed := TRUE;
+	    #in_Trip_Active := TRUE;
+	ELSE
+	    #out_Alarma_Overspeed := FALSE;
+	END_IF;
+	
+	IF #in_Trip_Active THEN
+	    #out_Frana_Mecanica := TRUE;
+	ELSIF ABS(#in_Joystick_Procent) < 2.0 AND ABS(#out_Viteza_Real) < 1.0 THEN
+	    #out_Frana_Mecanica := TRUE;
+	ELSE
+	    #out_Frana_Mecanica := FALSE;
+	END_IF;
+END_FUNCTION_BLOCK
+
