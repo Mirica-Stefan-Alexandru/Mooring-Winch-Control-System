@@ -48,6 +48,7 @@ Sistemul asigura controlul complet al motorului, achizitia semnalelor analogice,
 >*  **Baze de Date in Timp Real:** Stocarea continua si securizata a tuturor parametrilor critici (tensiuni pe Load Cell, turatie, istoric declansari ERS).
 >*  **Dashboard-uri Live & Grafice:** Construirea de platforme web centralizate pentru vizualizarea evolutiei masuratorilor sub forma de grafice in timp real.
 >*  **Sistem de Detectie Preventiva (Mentenanta Predictiva):** Implementarea algoritmilor software capabili sa detecteze anomalii si uzuri (ex. uzura franei mecanice sau oboseala cablului) prin analizarea tiparelor din istoricul datelor, inainte de a se transforma in defectiuni fizice.
-><img width="1262" height="410" alt="Node-Red_1" src="https://github.com/user-attachments/assets/1272dd42-656c-434f-bef2-79ab51bd6aea" />
-><img width="387" height="438" alt="Node-Red_2" src="https://github.com/user-attachments/assets/590b323b-f3b0-4cef-bb4a-f302fc75c038" />
+<img width="1817" height="927" alt="Screenshot 2026-09-03 231042" src="https://github.com/user-attachments/assets/6f9f70da-8260-4ab1-ae9e-c3001b858369" />
+<img width="1105" height="678" alt="Screenshot 2026-09-03 230812" src="https://github.com/user-attachments/assets/ad0cf15b-a0c1-4a5c-a5cd-c6222a6a4dc0" />
+
 ---
